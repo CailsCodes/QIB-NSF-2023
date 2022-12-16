@@ -82,6 +82,14 @@ class Scanner:
         port_found = (self._port in [p.device for p in serial.tools.list_ports.comports()])
         return True if port_found else False
 
+    def maintain_connection(self):
+        "DO NOT RUN IN MAIN LOOP"
+        CHECK_FREQUENCY = 5 #seconds
+        self.conn = self.connect_scanner(self._port)
+        while self.is_connected():
+            time.sleep(CHECK_FREQUENCY)
+        self.maintain_connection()
+
     
 
 
@@ -103,12 +111,6 @@ class Player:
         self._outcome = 0
         self._num_scans = 0
         self._start_time = 0 # time.now()
-
-
-    
-        
-
-    
 
 
     def fetch_input(self):
