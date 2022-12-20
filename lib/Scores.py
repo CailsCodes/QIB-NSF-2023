@@ -18,8 +18,8 @@ class Scores:
 
         self._db = sqlite3.connect(fp, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         self.scores = self._db.cursor()
-        self.scores.execute(SQL_MAKE_TABLE)
-        self._id = count(start=get_max_id())
+        self.scores.execute(self.SQL_MAKE_TABLE)
+        self._id = count(start=self.get_max_id())
 
 
     def get_max_id(self):
