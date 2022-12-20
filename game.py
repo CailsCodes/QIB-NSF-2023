@@ -1,22 +1,26 @@
-
+# Remember to include #! feature and remove .py extension so can be fun as an executable
 import pygame
-import serial
-from datetime import datetime
-from time import time
-from collections import deque
 
-from os import path
-
-import Tests
-import Scores
-
+pygame.display.init()
+pygame.time.init()
+pygame.image.init()
 
 DISPLAY_SIZE = (1920,1080)
-pygame.init()
+background_img_fp = ""
 screen = pygame.display.set_mode(DISPLAY_SIZE, pygame.FULLSCREEN)
-clock = pygame.time.Clock()
+background = pygame.image.load(background_img_fp).convert()
+pygame.update(background)
 
-population  = 10000
+# import _thread
+from collections import deque
+from datetime import datetime
+# from os import path
+from time import time
+
+import serial
+from lib import Scores, Scanner, LFT, PCR, Antibody
+
+POPULATION  = 10000
 
 cut_off = { # fraction of people who will be correctly testet tested, adjusted for penalty from including people who don't have disease
     "low"       : .65,
@@ -30,22 +34,46 @@ stage_of_disease = { # fraction of people who need to be retested
     "Very symptomatic"      : 0.05
     }
 
+_tests = ['LFT', 'Antibody', 'Blood']
+
+
 
 def calc_outcome(cost, cutoff, stag_dis):
-    f1 = population / cost
+    f1 = POPULATION / cost
     f2 = cutoff / (1+stag_dis)
     return f1 * f2
 
 
-# class Box:
-#     def __init__(self, x:int, y:int):
-#         self._fp = ""
-#         self._img = pygame.image.load(self._fp).convert_alpha()
-#         self._img_rect = self._img.get_rect()
-#         self.active = False
+def get_ports():
+    return [p.device for p in serial.tools.list_ports.comports()]
 
-class Component:
-    "Class object for Test components"
+
+class Box:
+
+    def __init__(self, fp, x:int, y:int):
+        self._fp = fp
+        self._img = pygame.image.load(self._fp).convert_alpha()
+        self._img_rect = self._img.get_rect()
+        self.active = False
+        self.active_pos = (x,y)
+
+    @property
+    def active(self):
+        return self._active
+
+    @active.setter
+    def active(self, value): # move square if the object has become active or de-activated
+        assert isinstance(value, bool)
+        self._active = value
+        if value:
+            self._img_rect = None
+        else:
+            self._img_rect = None
+
+    
+
+class TestImage:
+    "Class object for Test"
     def __init__(self, _player:int, x=0, y=0):
         self._player = _player
         self._fp = ""
@@ -54,51 +82,18 @@ class Component:
         self.x = x
         self.y = y
 
-
-class UpperComponent:
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
-class LowerComponent:
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
         
 
-class Scanner:
 
-    def __init__(self, _port):
-        self._port = _port
-        self.conn = self.connect_scanner(_port)
-
-    def connect_scanner(self, port):
-        return serial.Serial(port)
-
-    def close_connection(self):
-        self._input.close()
-
-    def is_connected(self):
-        port_found = (self._port in [p.device for p in serial.tools.list_ports.comports()])
-        return True if port_found else False
-
-    def maintain_connection(self):
-        "DO NOT RUN IN MAIN LOOP"
-        CHECK_FREQUENCY = 5 #seconds
-        self.conn = self.connect_scanner(self._port)
-        while self.is_connected():
-            time.sleep(CHECK_FREQUENCY)
-        self.maintain_connection()
 
     
 
 
 class Player:
     
-    def __init__(self, _num:int, _port:str):
-        self._input = serial.Serial(_port)
-        # self._screen_moving = False
-        self._player_num = _num
+    def __init__(self, player:int, port:str):
+        self.scanner = Scanner(port)
+        self._player_num = player
         self.X = self.Y = 0
 
         self.input_stream = deque(maxlen=10)
@@ -113,6 +108,16 @@ class Player:
         self._start_time = 0 # time.now()
 
 
+    @property
+    def options_selected(self):
+        return self._options_selected
+
+    @options_selected.setter
+    def options_selected(self, key, value):
+        self._options_selected[key] = value
+        # select which boxes to be moved
+
+
     def fetch_input(self):
         if self._input.in_waiting > 0:
             _txt = self._input.readlines().decode('utf-8')
@@ -122,7 +127,18 @@ class Player:
     
     def reader(self):
         if self.input_stream:
+            cmd = self.input_stream.pop()
 
+            if cmd == "complete":
+                self.save_results()
+                #load score
+            elif cmd in cut_off:
+                self.options_selected['cut-off'] == cmd
+            elif cmd in stage_of_disease:
+                self.options_selected['stage-of-disease'] = cmd
+            elif cmd in _tests:
+                self.options_selected['test'] = cmd
+            
 
 
     def time_to_complete(self):
@@ -130,12 +146,12 @@ class Player:
 
 
     def save_results(self):
-        ID = next(Scores._id)
-        timestamp = datetime.now()
-        time_length = self.time_to_complete()
-        test_sel = self.options_selected['test']
-        cutoff_sel = self.options_selected['cut-off']
-        sod_sel = self.options_selected['stage-of-disease']
+        ID              = next(Scores._id)
+        timestamp       = datetime.now()
+        time_length     = self.time_to_complete()
+        test_sel        = self.options_selected['test']
+        cutoff_sel      = self.options_selected['cut-off']
+        sod_sel         = self.options_selected['stage-of-disease']
 
         Scores.add_results(
                     ID, 
@@ -152,21 +168,24 @@ class Player:
 
 
 def run():
-
-    # load background
-    # find USB ports
-    # load players
+    clock = pygame.time.Clock()
+    
+    usb_ports = get_ports()
+    if len(usb_ports > 2):
+        time.sleep(1)
+        # have screen to inform player to only have scanners in USB ports
+    
+    player1 = Player(1, usb_ports[0])
+    player2 = Player(2, usb_ports[1])
 
 
     while True:
 
-
-        pygame.display.flip()
-        clock.tick(30)
+        # pygame.display.flip()
+        clock.tick(24)
     
 
 
 if __name__ == '__main__':
     run()
-
     Scores._db.close()
