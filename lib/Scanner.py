@@ -1,5 +1,8 @@
 import serial
 
+def get_ports():
+    return [p.device for p in serial.tools.list_ports.comports()]
+
 class Scanner:
 
     def __init__(self, _port):
