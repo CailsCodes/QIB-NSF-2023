@@ -26,7 +26,7 @@ class BaseTest:
 
 
 
-class LFT(BaseTest):
+class TestOption1(BaseTest):
     price_per_unit      = 0.3
 
     steps               = 0.1
@@ -35,7 +35,7 @@ class LFT(BaseTest):
     result_time         = 0.1
 
 
-class PCR(BaseTest):
+class TestOption2(BaseTest):
     upfront_expense     = 0.8
     price_per_unit      = 0.5
 
@@ -45,7 +45,7 @@ class PCR(BaseTest):
     steps               = 0.4
 
 
-class Antibody(BaseTest):
+class TestOption3(BaseTest):
     upfront_expense     = 0.9
     price_per_unit      = 0.9
 
