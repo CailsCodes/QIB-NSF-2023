@@ -1,0 +1,45 @@
+Box 1:
+  name: Pick your test
+  options:
+    None : 0
+    Blood test: 
+      index: 1
+      value: cost
+    Spit test:
+      index: 2
+      value: cost
+    DNA test: 
+      index: 3
+      value: cost
+
+
+Box 2:
+  name: How much virus can you detect?
+  description: fraction of people who will be correctly testet tested, adjusted for penalty from including people who don't have disease
+  options:
+    None : 0
+    low:
+      index: 1
+      value: .65
+    medium:
+      index: 2
+      value: .95
+    high:
+      index: 3
+      value: .35
+
+
+Box 3:
+  name: Who takes the test?
+  description: fraction of people who need to be retested
+  options:
+    None: 0
+    Everyone:
+      index: 1
+      value: 0.15
+    Started feeling ill:
+      index: 2
+      value: 0.35
+    Feeling very ill:
+      index: 3
+      value: 0.05
