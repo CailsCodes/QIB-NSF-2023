@@ -1,4 +1,4 @@
-from numpy import hypot 
+from math import hypot 
 
 
 class BaseTest:
