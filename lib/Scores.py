@@ -13,7 +13,6 @@ class Scores:
             stage_of_disease TEXT NOT NULL,
             outcome INTEGER NOT NULL,
             time_to_complete INTEGER NOT NULL,
-            num_scans INTEGER NOT NULL
             )"""
 
         self._db = sqlite3.connect(fp, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
