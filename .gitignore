@@ -1,2 +1,10 @@
 test.py
+.vscode/
+__pycache__/
+scores.db
+
+testbench.ipynb
+assets/test_text.ai
+assets/Guides.xlsx
+assets/main.ai
 
