@@ -1,4 +1,15 @@
-# Remember to include #! feature and remove .py extension so can be fun as an executable
+
+"""
+Testing, testing, 1-2-3!
+
+
+...
+
+Author: Cailean Carter
+Contact: cailean.carter@quadram.ac.uk
+Affiliation: Quadram Institute, Norwich, UK
+
+"""
 
 from collections import ChainMap
 from time import localtime, strftime, time
@@ -11,6 +22,7 @@ from lib import (Options, Scores, TestOption1, TestOption2, TestOption3,
 #------------------------------------------------------------------
 #               GLOBAL VARIABLES
 #------------------------------------------------------------------
+
 DISPLAY_SIZE = (1920,1080)
 REFRESH_RATE = 24
 POPULATION  = 10000
@@ -22,10 +34,12 @@ SCIENTIST_IMGS = {
 BUILDING = False
 start_time = time()
 
-background_img_fp = "assets/background.png"
+background_img_fp = "assets/Background.png"
 
 TESTS_DELIVERED = 0
 PEOPLE_TREATED = 0
+
+scanner_input = ""
 
 #------------------------------------------------------------------
 #               INITIALISE METHODS
@@ -42,26 +56,20 @@ screen = pygame.display.set_mode(DISPLAY_SIZE, pygame.FULLSCREEN)
 
 
 #------------------------------------------------------------------
-#               RUN GAME
-#------------------------------------------------------------------
-
-
-
-#------------------------------------------------------------------
 #               LOAD GAME ASSETS
 #------------------------------------------------------------------
 
-background = pygame.image.load(background_img_fp).convert()
-ScientistImg = pygame.image.load(SCIENTIST_IMGS[1]).convert_alpha()
-ScientificReport = pygame.image.load("assets/scientific_report.png").convert_alpha()
-peopleTreated = pygame.image.load("assets/people_treated.png").convert_alpha()
-testsDelivered = pygame.image.load("assets/tests_delivered.png").convert_alpha()
+background          = pygame.image.load(background_img_fp).convert()
+ScientistImg        = pygame.image.load(SCIENTIST_IMGS[1]).convert_alpha()
+ScientificReport    = pygame.image.load("assets/scientific_report.png").convert_alpha()
+peopleTreated       = pygame.image.load("assets/people_treated.png").convert_alpha()
+testsDelivered      = pygame.image.load("assets/tests_delivered.png").convert_alpha()
 
-cabinsketch_font = pygame.font.Font("assets/fonts/CabinSketch-Bold.ttf", 68)
+cabinsketch_font    = pygame.font.Font("assets/fonts/CabinSketch-Bold.ttf", 68)
 
-Box1img = pygame.image.load("assets/box1.png").convert_alpha()
-Box2img = pygame.image.load("assets/box2.png").convert_alpha()
-Box3img = pygame.image.load("assets/box3.png").convert_alpha()
+Box1img             = pygame.image.load("assets/box1.png").convert_alpha()
+Box2img             = pygame.image.load("assets/box2.png").convert_alpha()
+Box3img             = pygame.image.load("assets/box3.png").convert_alpha()
 
 B1O0 = Options("Null", 1, 0, None, None, True)
 B1O1 = TestOptions("Blood test", 1, 1, Box1img, False, TestOption1)
@@ -96,9 +104,9 @@ def calc_outcome(v1, v2, v3):
     "Calculates number of tests delivered"
     return (POPULATION/v1) * (v2/(1+v3))
 
-def get_selected(): return (i for i in refs.values() if i.selected)
-def get_null(): return (i for i in refs.values() if i.name == 'Null')
-def ready_to_build(): return not any((i for i in get_selected() if i.name == 'Null')) or BUILDING
+def get_selected(): return (option for option in refs.values() if option.selected)
+def get_null(): return (option for option in refs.values() if option.name == 'Null')
+def ready_to_build(): return not any((option for option in get_selected() if option.name == 'Null')) and not BUILDING
 
 def get_selected_in_box(box:int):
     for i in get_selected():
@@ -113,11 +121,7 @@ def draw_screen():
             x, y = i.coordinates
             width = i.width
             screen.blit(i.image, (x,y), (width*(i.index - 1), 0,  width, 220))
-    if BUILDING:
-        pass
-
     pygame.display.flip()
-
 
 def swap_selected(new):
     old = get_selected_in_box(new.box)
@@ -134,7 +138,8 @@ def update_scientist_num(num:int):
     SCIENTIST_NUM = num
     img = SCIENTIST_IMGS[num]
     ScientistImg = pygame.image.load(img).convert_alpha()
-    draw_screen()
+    if not BUILDING:
+        draw_screen()
 
 def start_game(*_):
     global start_time
@@ -170,7 +175,6 @@ def draw_tests_delivered():
     pygame.display.flip()
     pygame.time.set_timer(SHOW_TESTS_DELIVERED_VALUE_EVENT, 1000, loops=1)
 
-
 def draw_tests_delivered_value():
     text = str(TESTS_DELIVERED)
     visual = cabinsketch_font.render(text, True, (4, 186, 130))
@@ -180,12 +184,10 @@ def draw_tests_delivered_value():
     pygame.display.flip()
     pygame.time.set_timer(SHOW_PEOPLE_TREATED_EVENT, 1000, loops=1)
 
-
 def draw_people_treated():
     screen.blit(peopleTreated, (1315, 712))
     pygame.display.flip()
     pygame.time.set_timer(SHOW_PEOPLE_TREATED_VALUE_EVENT, 1000, loops=1)
-
 
 def draw_people_treated_value():
     text = str(PEOPLE_TREATED)
@@ -200,6 +202,7 @@ def build(*_):
         global BUILDING
         global TESTS_DELIVERED
         global PEOPLE_TREATED
+
         BUILDING = True
 
         B1, B2, B3 = get_selected()
@@ -209,9 +212,6 @@ def build(*_):
         save_results((B1, B2, B3))
 
         draw_scientific_report()
-
-
-        
 
 
 #------------------------------------------------------------------
@@ -226,6 +226,7 @@ SCANNER_INPUTS.update({
     "scientist1" : (update_scientist_num, 1),
     "scientist2" : (update_scientist_num, 2)
     }) # type: ignore
+
 KB_INPUTS = {
     " " : (start_game, None), # new game / refresh
     # pygame.K_ESCAPE : (close_game, None),
@@ -244,6 +245,7 @@ KB_INPUTS = {
     }
 
 ALL_INPUTS = ChainMap(SCANNER_INPUTS, KB_INPUTS)
+
 INPUT_TIMEOUT_EVENT                 = pygame.USEREVENT + 1
 SHOW_TESTS_DELIVERED_EVENT          = pygame.USEREVENT + 2
 SHOW_TESTS_DELIVERED_VALUE_EVENT    = pygame.USEREVENT + 3
@@ -257,7 +259,6 @@ scientific_report_events = {
     SHOW_PEOPLE_TREATED_VALUE_EVENT     : draw_people_treated_value
     }
 
-scanner_input = ""
 
 #------------------------------------------------------------------
 #               MAIN LOOP
@@ -286,8 +287,4 @@ while True:
         elif e.type in scientific_report_events:
             scientific_report_events[e.type]()
             
-
     clock.tick(REFRESH_RATE)
-
-
-    
