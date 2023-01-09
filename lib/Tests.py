@@ -25,8 +25,18 @@ class BaseTest:
         return hypot(cls.price(), cls.work())
 
 
-
 class TestOption1(BaseTest):
+    "Blood test"
+    upfront_expense     = 0.9
+    price_per_unit      = 0.9
+
+    steps               = 0.7
+    portability         = 1
+    result_time         = 0.4
+
+
+class TestOption2(BaseTest):
+    "LFT"
     price_per_unit      = 0.3
 
     steps               = 0.1
@@ -35,7 +45,8 @@ class TestOption1(BaseTest):
     result_time         = 0.1
 
 
-class TestOption2(BaseTest):
+class TestOption3(BaseTest):
+    "DNA test"
     upfront_expense     = 0.8
     price_per_unit      = 0.5
 
@@ -45,12 +56,6 @@ class TestOption2(BaseTest):
     steps               = 0.4
 
 
-class TestOption3(BaseTest):
-    upfront_expense     = 0.9
-    price_per_unit      = 0.9
 
-    steps               = 0.7
-    portability         = 1
-    result_time         = 0.4
 
 

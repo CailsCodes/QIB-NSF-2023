@@ -84,7 +84,7 @@ B2O3 = Options("high", 2, 3, .35, Box2img, False)
 B3O0 = B1O0._replace(box=3)
 B3O1 = Options("Everyone", 3, 1, .15, Box3img, False)
 B3O2 = Options("Starting feeling ill", 3, 2, .35, Box3img, False)
-B3O3 = Options("Feeling very ill", 3, 3, .5, Box3img, False)
+B3O3 = Options("Feeling very ill", 3, 3, .05, Box3img, False)
 
 options = [B1O0, B1O1, B1O2, B1O3, B2O0, B2O1, B2O2, B2O3, B3O0, B3O1, B3O2, B3O3]
 
