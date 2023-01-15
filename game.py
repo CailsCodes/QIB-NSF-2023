@@ -71,6 +71,9 @@ Box1img             = pygame.image.load("assets/box1.png").convert_alpha()
 Box2img             = pygame.image.load("assets/box2.png").convert_alpha()
 Box3img             = pygame.image.load("assets/box3.png").convert_alpha()
 
+StarImgOutline      = pygame.image.load("assets/starOutline.png").convert_alpha()
+StarImg             = pygame.image.load("assets/star.png").convert_alpha()
+
 B1O0 = Options("Null", 1, 0, None, None, True)
 B1O1 = TestOptions("Blood test", 1, 1, Box1img, False, TestOption1)
 B1O2 = TestOptions("Spit test", 1, 2, Box1img, False, TestOption2)
@@ -196,6 +199,21 @@ def draw_people_treated_value():
     x = 1533 - (width/2)
     screen.blit(visual, (x, 806))
     pygame.display.flip()
+    pygame.time.set_timer(DRAW_STAR_OUTLINE_EVENT, 1000, loops=1)
+
+def draw_star_outline():
+    screen.blit(StarImgOutline, ())
+    pygame.display.flip()
+    pygame.time.set_timer(STAR1_EVENT, 1000, loops=1)
+
+def draw_star(num):
+    x = 1
+    x *= num
+
+    
+
+    pygame.display.flip()
+
 
 def build(*_):
     if ready_to_build():
@@ -251,12 +269,24 @@ SHOW_TESTS_DELIVERED_EVENT          = pygame.USEREVENT + 2
 SHOW_TESTS_DELIVERED_VALUE_EVENT    = pygame.USEREVENT + 3
 SHOW_PEOPLE_TREATED_EVENT           = pygame.USEREVENT + 4
 SHOW_PEOPLE_TREATED_VALUE_EVENT     = pygame.USEREVENT + 5
+DRAW_STAR_OUTLINE_EVENT             = pygame.USEREVENT + 6
+STAR1_EVENT                         = pygame.USEREVENT + 7
+STAR2_EVENT                         = pygame.USEREVENT + 8
+STAR3_EVENT                         = pygame.USEREVENT + 9
+STAR4_EVENT                         = pygame.USEREVENT + 10
+STAR5_EVENT                         = pygame.USEREVENT + 11
+
 
 scientific_report_events = {
     SHOW_TESTS_DELIVERED_EVENT          : draw_tests_delivered,
     SHOW_TESTS_DELIVERED_VALUE_EVENT    : draw_tests_delivered_value,
     SHOW_PEOPLE_TREATED_EVENT           : draw_people_treated,
-    SHOW_PEOPLE_TREATED_VALUE_EVENT     : draw_people_treated_value
+    SHOW_PEOPLE_TREATED_VALUE_EVENT     : draw_people_treated_value,
+    STAR1_EVENT                         : pygame.USEREVENT + 6,
+    STAR2_EVENT                         : pygame.USEREVENT + 7,
+    STAR3_EVENT                         : pygame.USEREVENT + 8,
+    STAR4_EVENT                         : pygame.USEREVENT + 9,
+    STAR5_EVENT                         : pygame.USEREVENT + 10
     }
 
 
