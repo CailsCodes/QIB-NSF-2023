@@ -147,8 +147,9 @@ def update_scientist_num(num:int):
     SCIENTIST_NUM = num+1
     img = SCIENTIST_IMGS[num]
     ScientistImg = pygame.image.load(img).convert_alpha()
-    if not BUILDING:
-        draw_screen()
+    screen.blit(background, (0,73), (0, 73, 370, 138))
+    screen.blit(ScientistImg, (46, 108))
+    pygame.display.flip()
 
 def start_game(*_):
     global start_time
@@ -182,7 +183,7 @@ def draw_scientific_report(*_):
 def draw_tests_delivered(*_):
     screen.blit(testsDelivered, (1315, 500))
     pygame.display.flip()
-    pygame.time.set_timer(SHOW_TESTS_DELIVERED_VALUE_EVENT, 1000, loops=1)
+    pygame.time.set_timer(SHOW_TESTS_DELIVERED_VALUE_EVENT, 1, loops=1)
 
 def draw_tests_delivered_value(*_):
     text = "{:,}".format(TESTS_DELIVERED)
@@ -191,12 +192,12 @@ def draw_tests_delivered_value(*_):
     x = 1533 - (width/2)
     screen.blit(visual, (x, 595))
     pygame.display.flip()
-    pygame.time.set_timer(SHOW_PEOPLE_TREATED_EVENT, 1000, loops=1)
+    pygame.time.set_timer(SHOW_PEOPLE_TREATED_EVENT, 1500, loops=1)
 
 def draw_people_treated(*_):
     screen.blit(peopleTreated, (1315, 712))
     pygame.display.flip()
-    pygame.time.set_timer(SHOW_PEOPLE_TREATED_VALUE_EVENT, 1000, loops=1)
+    pygame.time.set_timer(SHOW_PEOPLE_TREATED_VALUE_EVENT, 1, loops=1)
 
 def draw_people_treated_value(*_):
     text = "{:,}".format(PEOPLE_TREATED)
@@ -205,7 +206,7 @@ def draw_people_treated_value(*_):
     x = 1533 - (width/2)
     screen.blit(visual, (x, 806))
     pygame.display.flip()
-    pygame.time.set_timer(STAR0_EVENT, 1000, loops=1)
+    pygame.time.set_timer(STAR0_EVENT, 1500, loops=1)
 
 def draw_star(num):
     y = 880-8
@@ -231,9 +232,9 @@ def draw_star(num):
     
     threshold, next_star_event = next_star_eligibility[num]
     if PEOPLE_TREATED >= threshold:
-        pygame.time.set_timer(next_star_event, 1000, loops=1)
+        pygame.time.set_timer(next_star_event, 750, loops=1)
     else:
-        pygame.time.set_timer(COMMENT_EVENT, 1000, loops=1)
+        pygame.time.set_timer(COMMENT_EVENT, 300, loops=1)
     pygame.display.flip()
 
 def draw_comment(*_):
