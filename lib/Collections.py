@@ -24,7 +24,7 @@ class OptionProperties:
     def width(self):
         widths = {
             1 : 641,
-            2 : 1036,
+            2 : 918,
             3 : 918
             }
         return widths[self.box] # type: ignore

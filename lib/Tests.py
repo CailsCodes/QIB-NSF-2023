@@ -47,13 +47,13 @@ class TestOption2(BaseTest):
 
 class TestOption3(BaseTest):
     "DNA test"
-    upfront_expense     = 0.8
+    upfront_expense     = 0.65
     price_per_unit      = 0.5
 
-    portability         = .6
+    portability         = .4
     dev_time            = 0.2
     result_time         = 0.3
-    steps               = 0.4
+    steps               = 0.3
 
 
 

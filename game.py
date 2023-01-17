@@ -27,14 +27,9 @@ DISPLAY_SIZE = (1920,1080)
 REFRESH_RATE = 24
 POPULATION  = 10000
 SCIENTIST_NUM = 1
-SCIENTIST_IMGS = {
-    1 : "assets/scientist1.png",
-    2 : "assets/scientist2.png"
-    }
+SCIENTIST_IMGS = ("assets/scientist1.png", "assets/scientist2.png")
 BUILDING = False
 start_time = time()
-
-background_img_fp = "assets/Background.png"
 
 TESTS_DELIVERED = 0
 PEOPLE_TREATED = 0
@@ -46,21 +41,19 @@ scanner_input = ""
 #------------------------------------------------------------------
 
 pygame.display.init()
+screen = pygame.display.set_mode(DISPLAY_SIZE, pygame.FULLSCREEN)
 pygame.font.init()
 clock = pygame.time.Clock()
 pygame.mouse.set_visible(False)
 
 scoring = Scores()
 
-screen = pygame.display.set_mode(DISPLAY_SIZE, pygame.FULLSCREEN)
-
-
 #------------------------------------------------------------------
 #               LOAD GAME ASSETS
 #------------------------------------------------------------------
 
-background          = pygame.image.load(background_img_fp).convert()
-ScientistImg        = pygame.image.load(SCIENTIST_IMGS[1]).convert_alpha()
+background          = pygame.image.load("assets/Background.png").convert()
+ScientistImg        = pygame.image.load(SCIENTIST_IMGS[0]).convert_alpha()
 ScientificReport    = pygame.image.load("assets/scientific_report.png").convert_alpha()
 peopleTreated       = pygame.image.load("assets/people_treated.png").convert_alpha()
 testsDelivered      = pygame.image.load("assets/tests_delivered.png").convert_alpha()
@@ -73,6 +66,8 @@ Box3img             = pygame.image.load("assets/box3.png").convert_alpha()
 
 StarImgOutline      = pygame.image.load("assets/starOutline.png").convert_alpha()
 StarImg             = pygame.image.load("assets/star.png").convert_alpha()
+StarPoints          = pygame.image.load("assets/starPoints.png").convert_alpha()
+reportComments      = pygame.image.load("assets/reportComments.png").convert_alpha()
 
 B1O0 = Options("Null", 1, 0, None, None, True)
 B1O1 = TestOptions("Blood test", 1, 1, Box1img, False, TestOption1)
@@ -80,17 +75,16 @@ B1O2 = TestOptions("Spit test", 1, 2, Box1img, False, TestOption2)
 B1O3 = TestOptions("DNA test", 1, 3, Box1img, False, TestOption3)
 
 B2O0 = B1O0._replace(box=2)
-B2O1 = Options("low", 2, 1, .65, Box2img, False)
-B2O2 = Options("medium", 2, 2, .95, Box2img, False)
-B2O3 = Options("high", 2, 3, .35, Box2img, False)
+B2O1 = Options("Everybody", 2, 1, 0.7, Box2img, False)
+B2O2 = Options("Those who feel sick", 2, 2, 1, Box2img, False)
+B2O3 = Options("The very sick", 2, 3, .4, Box2img, False)
 
 B3O0 = B1O0._replace(box=3)
-B3O1 = Options("Everyone", 3, 1, .15, Box3img, False)
-B3O2 = Options("Starting feeling ill", 3, 2, .35, Box3img, False)
-B3O3 = Options("Feeling very ill", 3, 3, .05, Box3img, False)
+B3O1 = Options("Weak", 3, 1, .5, Box3img, False)
+B3O2 = Options("Balanced", 3, 2, .8, Box3img, False)
+B3O3 = Options("Strong", 3, 3, 1, Box3img, False)
 
 options = [B1O0, B1O1, B1O2, B1O3, B2O0, B2O1, B2O2, B2O3, B3O0, B3O1, B3O2, B3O3]
-
 refs = {o.__str__() : o for o in options}
 
 
@@ -103,9 +97,22 @@ def close_game(*_):
     pygame.quit()
     quit()
 
-def calc_outcome(v1, v2, v3):
-    "Calculates number of tests delivered"
-    return (POPULATION/v1) * (v2/(1+v3))
+def calc_outcome(v1:int, v2:int, v3:int):
+    """
+    Arguments:
+    ----------
+        v1 (int) : cost of test
+        v2 (int) : who takes the test
+        v3 (int) : detection strength
+    
+    Returns:
+    --------
+        Tests delivered (int)
+        People treated (int)
+    """
+    tests_delivered = (POPULATION / v1) * v2 * 1.0245
+    people_treated = tests_delivered * v3
+    return int(tests_delivered), int(people_treated)
 
 def get_selected(): return (option for option in refs.values() if option.selected)
 def get_null(): return (option for option in refs.values() if option.name == 'Null')
@@ -132,13 +139,12 @@ def swap_selected(new):
         global refs
         refs[old.__str__()] = old._replace(selected=False) # type: ignore
         refs[new.__str__()] = new._replace(selected=True)
-        # print(f"Swap from {old.__str__()} to {new.__str__()} done!")
         draw_screen()
         
 def update_scientist_num(num:int):
     global SCIENTIST_NUM
     global ScientistImg
-    SCIENTIST_NUM = num
+    SCIENTIST_NUM = num+1
     img = SCIENTIST_IMGS[num]
     ScientistImg = pygame.image.load(img).convert_alpha()
     if not BUILDING:
@@ -155,9 +161,9 @@ def start_game(*_):
 
 def save_results(selected):
     timestamp       = strftime("%d %b %Y %H:%M:%S", localtime())
-    time_length     = round(start_time - time(), 2)
+    time_length     = int(time() - start_time)
     B1, B2, B3 = selected
-    scoring.add_results( # AMEND ORDER FOR NEW SQL DATABASE
+    scoring.add_results(
                 timestamp, 
                 time_length,
                 SCIENTIST_NUM, 
@@ -168,18 +174,18 @@ def save_results(selected):
                 PEOPLE_TREATED
                 )
 
-def draw_scientific_report():
-    screen.blit(ScientificReport, (1210, 330))
+def draw_scientific_report(*_):
+    screen.blit(ScientificReport, (1200, 320))
     pygame.display.flip()
     pygame.time.set_timer(SHOW_TESTS_DELIVERED_EVENT, 1000, loops=1)
 
-def draw_tests_delivered():
+def draw_tests_delivered(*_):
     screen.blit(testsDelivered, (1315, 500))
     pygame.display.flip()
     pygame.time.set_timer(SHOW_TESTS_DELIVERED_VALUE_EVENT, 1000, loops=1)
 
-def draw_tests_delivered_value():
-    text = str(TESTS_DELIVERED)
+def draw_tests_delivered_value(*_):
+    text = "{:,}".format(TESTS_DELIVERED)
     visual = cabinsketch_font.render(text, True, (4, 186, 130))
     width, _ = cabinsketch_font.size(text)
     x = 1533 - (width/2)
@@ -187,33 +193,65 @@ def draw_tests_delivered_value():
     pygame.display.flip()
     pygame.time.set_timer(SHOW_PEOPLE_TREATED_EVENT, 1000, loops=1)
 
-def draw_people_treated():
+def draw_people_treated(*_):
     screen.blit(peopleTreated, (1315, 712))
     pygame.display.flip()
     pygame.time.set_timer(SHOW_PEOPLE_TREATED_VALUE_EVENT, 1000, loops=1)
 
-def draw_people_treated_value():
-    text = str(PEOPLE_TREATED)
+def draw_people_treated_value(*_):
+    text = "{:,}".format(PEOPLE_TREATED)
     visual = cabinsketch_font.render(text, True, (4, 186, 130))
     width, _ = cabinsketch_font.size(text)
     x = 1533 - (width/2)
     screen.blit(visual, (x, 806))
     pygame.display.flip()
-    pygame.time.set_timer(DRAW_STAR_OUTLINE_EVENT, 1000, loops=1)
-
-def draw_star_outline():
-    screen.blit(StarImgOutline, ())
-    pygame.display.flip()
-    pygame.time.set_timer(STAR1_EVENT, 1000, loops=1)
+    pygame.time.set_timer(STAR0_EVENT, 1000, loops=1)
 
 def draw_star(num):
-    x = 1
-    x *= num
-
+    y = 880-8
+    x_coords = [1330, 1437, 1544, 1651, 1760]
+    next_star_eligibility = {
+        0 : (500,  STAR1_EVENT),
+        1 : (1500, STAR2_EVENT),
+        2 : (3000, STAR3_EVENT),
+        3 : (4500, STAR4_EVENT),
+        4 : (6000, STAR5_EVENT),
+        5 : (10000, None)
+        }
     
+    fill = x_coords[:num]
+    empty = x_coords[num:]
+    screen.blit(background, (1318,872), (1318, 872, 538, 114))
+    screen.blit(StarPoints, (1350, 960))
 
+    for fx in fill:
+        screen.blit(StarImg, (fx-8, y))
+    for ex in empty:
+        screen.blit(StarImgOutline, (ex-8, y))
+    
+    threshold, next_star_event = next_star_eligibility[num]
+    if PEOPLE_TREATED >= threshold:
+        pygame.time.set_timer(next_star_event, 1000, loops=1)
+    else:
+        pygame.time.set_timer(COMMENT_EVENT, 1000, loops=1)
     pygame.display.flip()
 
+def draw_comment(*_):
+    x,y = (1312, 980)
+    height = 92
+    width = 544
+    comments = {
+        6000 : 368,
+        4500 : 276,
+        3000 : 184,
+        1500 : 92,
+        500 : 0
+        }
+    for threshold, y_offset in comments.items():
+        if PEOPLE_TREATED >= threshold:
+            screen.blit(reportComments, (x,y), (0, y_offset,  width, height))
+            pygame.display.flip()
+            return
 
 def build(*_):
     if ready_to_build():
@@ -222,13 +260,9 @@ def build(*_):
         global PEOPLE_TREATED
 
         BUILDING = True
-
         B1, B2, B3 = get_selected()
-        TESTS_DELIVERED = int(POPULATION / B1.value)
-        PEOPLE_TREATED = int(calc_outcome(B1.value, B2.value, B3.value))
-
+        TESTS_DELIVERED, PEOPLE_TREATED = calc_outcome(B1.value, B2.value, B3.value)
         save_results((B1, B2, B3))
-
         draw_scientific_report()
 
 
@@ -247,10 +281,9 @@ SCANNER_INPUTS.update({
 
 KB_INPUTS = {
     " " : (start_game, None), # new game / refresh
-    # pygame.K_ESCAPE : (close_game, None),
     "b" : (build, None), # build
-    "1" : (update_scientist_num, 1),
-    "2" : (update_scientist_num, 2),
+    "1" : (update_scientist_num, 0),
+    "2" : (update_scientist_num, 1),
     "q" : (swap_selected, B1O1),
     "w" : (swap_selected, B1O2),
     "e" : (swap_selected, B1O3),
@@ -269,24 +302,26 @@ SHOW_TESTS_DELIVERED_EVENT          = pygame.USEREVENT + 2
 SHOW_TESTS_DELIVERED_VALUE_EVENT    = pygame.USEREVENT + 3
 SHOW_PEOPLE_TREATED_EVENT           = pygame.USEREVENT + 4
 SHOW_PEOPLE_TREATED_VALUE_EVENT     = pygame.USEREVENT + 5
-DRAW_STAR_OUTLINE_EVENT             = pygame.USEREVENT + 6
-STAR1_EVENT                         = pygame.USEREVENT + 7
-STAR2_EVENT                         = pygame.USEREVENT + 8
-STAR3_EVENT                         = pygame.USEREVENT + 9
-STAR4_EVENT                         = pygame.USEREVENT + 10
-STAR5_EVENT                         = pygame.USEREVENT + 11
-
+STAR0_EVENT                         = pygame.USEREVENT + 7
+STAR1_EVENT                         = pygame.USEREVENT + 8
+STAR2_EVENT                         = pygame.USEREVENT + 9
+STAR3_EVENT                         = pygame.USEREVENT + 10
+STAR4_EVENT                         = pygame.USEREVENT + 11
+STAR5_EVENT                         = pygame.USEREVENT + 12
+COMMENT_EVENT                       = pygame.USEREVENT + 13
 
 scientific_report_events = {
-    SHOW_TESTS_DELIVERED_EVENT          : draw_tests_delivered,
-    SHOW_TESTS_DELIVERED_VALUE_EVENT    : draw_tests_delivered_value,
-    SHOW_PEOPLE_TREATED_EVENT           : draw_people_treated,
-    SHOW_PEOPLE_TREATED_VALUE_EVENT     : draw_people_treated_value,
-    STAR1_EVENT                         : pygame.USEREVENT + 6,
-    STAR2_EVENT                         : pygame.USEREVENT + 7,
-    STAR3_EVENT                         : pygame.USEREVENT + 8,
-    STAR4_EVENT                         : pygame.USEREVENT + 9,
-    STAR5_EVENT                         : pygame.USEREVENT + 10
+    SHOW_TESTS_DELIVERED_EVENT          : (draw_tests_delivered, None),
+    SHOW_TESTS_DELIVERED_VALUE_EVENT    : (draw_tests_delivered_value, None),
+    SHOW_PEOPLE_TREATED_EVENT           : (draw_people_treated, None),
+    SHOW_PEOPLE_TREATED_VALUE_EVENT     : (draw_people_treated_value, None),
+    STAR0_EVENT                         : (draw_star,0),
+    STAR1_EVENT                         : (draw_star,1),
+    STAR2_EVENT                         : (draw_star,2),
+    STAR3_EVENT                         : (draw_star,3),
+    STAR4_EVENT                         : (draw_star,4),
+    STAR5_EVENT                         : (draw_star,5),
+    COMMENT_EVENT                       : (draw_comment, None)
     }
 
 
@@ -315,6 +350,7 @@ while True:
             scanner_input = ""
 
         elif e.type in scientific_report_events:
-            scientific_report_events[e.type]()
+            func, args = scientific_report_events[e.type]
+            func(args)
             
     clock.tick(REFRESH_RATE)

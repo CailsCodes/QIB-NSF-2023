@@ -14,32 +14,32 @@ Box 1:
 
 
 Box 2:
-  name: How much virus can you detect?
-  description: fraction of people who will be correctly testet tested, adjusted for penalty from including people who don't have disease
+  name: Who takes the test?
+  description: Proportion of population who would benefit from test
   options:
     None : 0
-    low:
+    Everybody:
       index: 1
-      value: .65
-    medium:
+      value: .7
+    Those who feel sick:
       index: 2
-      value: .95
-    high:
+      value: 1
+    The very sick:
       index: 3
-      value: .35
+      value: .4
 
 
 Box 3:
-  name: Who takes the test?
-  description: fraction of people who need to be retested
+  name: Detection strength
+  description: How well the test detects the virus
   options:
     None: 0
-    Everyone:
+    Weak:
       index: 1
-      value: .15
-    Started feeling ill:
+      value: .5
+    Balanced:
       index: 2
-      value: .35
-    Feeling very ill:
+      value: .8
+    Strong:
       index: 3
-      value: .05
+      value: 1
