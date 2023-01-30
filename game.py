@@ -183,7 +183,7 @@ def draw_scientific_report(*_):
 def draw_tests_delivered(*_):
     screen.blit(testsDelivered, (1315, 500))
     pygame.display.flip()
-    pygame.time.set_timer(SHOW_TESTS_DELIVERED_VALUE_EVENT, 1, loops=1)
+    pygame.time.set_timer(SHOW_TESTS_DELIVERED_VALUE_EVENT, 300, loops=1)
 
 def draw_tests_delivered_value(*_):
     text = "{:,}".format(TESTS_DELIVERED)
@@ -197,7 +197,7 @@ def draw_tests_delivered_value(*_):
 def draw_people_treated(*_):
     screen.blit(peopleTreated, (1315, 712))
     pygame.display.flip()
-    pygame.time.set_timer(SHOW_PEOPLE_TREATED_VALUE_EVENT, 1, loops=1)
+    pygame.time.set_timer(SHOW_PEOPLE_TREATED_VALUE_EVENT, 300, loops=1)
 
 def draw_people_treated_value(*_):
     text = "{:,}".format(PEOPLE_TREATED)
@@ -206,7 +206,7 @@ def draw_people_treated_value(*_):
     x = 1533 - (width/2)
     screen.blit(visual, (x, 806))
     pygame.display.flip()
-    pygame.time.set_timer(STAR0_EVENT, 1500, loops=1)
+    pygame.time.set_timer(STAR0_EVENT, 1750, loops=1)
 
 def draw_star(num):
     y = 880-8
@@ -222,7 +222,7 @@ def draw_star(num):
     
     fill = x_coords[:num]
     empty = x_coords[num:]
-    screen.blit(background, (1318,872), (1318, 872, 538, 114))
+    screen.blit(background, (1318,878), (1318, 878, 538, 112))
     screen.blit(StarPoints, (1350, 960))
 
     for fx in fill:
@@ -232,9 +232,9 @@ def draw_star(num):
     
     threshold, next_star_event = next_star_eligibility[num]
     if PEOPLE_TREATED >= threshold:
-        pygame.time.set_timer(next_star_event, 750, loops=1)
+        pygame.time.set_timer(next_star_event, 400, loops=1)
     else:
-        pygame.time.set_timer(COMMENT_EVENT, 300, loops=1)
+        pygame.time.set_timer(COMMENT_EVENT, 1300, loops=1)
     pygame.display.flip()
 
 def draw_comment(*_):
