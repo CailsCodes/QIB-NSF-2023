@@ -12,12 +12,13 @@ Affiliation: Quadram Institute, Norwich, UK
 """
 
 from collections import ChainMap
+from itertools import product
 from time import localtime, strftime, time
 
 import pygame
 
-from lib import (Options, Scores, TestOption1, TestOption2, TestOption3,
-                 TestOptions)
+from lib import (Feedback, Options, Scores, TestOption1, TestOption2,
+                 TestOption3, TestOptions)
 
 #------------------------------------------------------------------
 #               GLOBAL VARIABLES
@@ -47,6 +48,7 @@ clock = pygame.time.Clock()
 pygame.mouse.set_visible(False)
 
 scoring = Scores()
+feedback = Feedback()
 
 #------------------------------------------------------------------
 #               LOAD GAME ASSETS
@@ -117,6 +119,7 @@ def calc_outcome(v1:int, v2:int, v3:int):
 def get_selected(): return (option for option in refs.values() if option.selected)
 def get_null(): return (option for option in refs.values() if option.name == 'Null')
 def ready_to_build(): return not any((option for option in get_selected() if option.name == 'Null')) and not BUILDING
+def get_time_stamp(): return strftime("%d %b %Y %H:%M:%S", localtime())
 
 def get_selected_in_box(box:int):
     for i in get_selected():
@@ -161,7 +164,7 @@ def start_game(*_):
     draw_screen()
 
 def save_results(selected):
-    timestamp       = strftime("%d %b %Y %H:%M:%S", localtime())
+    timestamp       = get_time_stamp()
     time_length     = int(time() - start_time)
     B1, B2, B3 = selected
     scoring.add_results(
@@ -266,9 +269,13 @@ def build(*_):
         save_results((B1, B2, B3))
         draw_scientific_report()
 
+def give_feedback(question:int, answer:int):
+    timestamp = get_time_stamp()
+    feedback.add_feedback(timestamp, SCIENTIST_NUM, question, answer)
+
 
 #------------------------------------------------------------------
-#               HANDLING GAME INPUTS
+#               HANDLING GAME INPUTS AND EVENTS
 #------------------------------------------------------------------
 
 SCANNER_INPUTS = {k : (swap_selected, v) for k, v in refs.items() if not k.endswith('O0')}
@@ -296,7 +303,11 @@ KB_INPUTS = {
     "c" : (swap_selected, B3O3)
     }
 
-ALL_INPUTS = ChainMap(SCANNER_INPUTS, KB_INPUTS)
+FEEDBACK_INPUTS = {
+    f"Q{q}A{a}" : (give_feedback, (q,a)) for q,a in product(range(1,4), repeat=2)
+    }
+
+ALL_INPUTS = ChainMap(SCANNER_INPUTS, KB_INPUTS, FEEDBACK_INPUTS) # type: ignore
 
 INPUT_TIMEOUT_EVENT                 = pygame.USEREVENT + 1
 SHOW_TESTS_DELIVERED_EVENT          = pygame.USEREVENT + 2
@@ -353,5 +364,5 @@ while True:
         elif e.type in scientific_report_events:
             func, args = scientific_report_events[e.type]
             func(args)
-            
+
     clock.tick(REFRESH_RATE)
