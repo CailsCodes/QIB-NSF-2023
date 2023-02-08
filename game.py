@@ -28,7 +28,7 @@ DISPLAY_SIZE = (1920,1080)
 REFRESH_RATE = 24
 POPULATION  = 10000
 SCIENTIST_NUM = 1
-SCIENTIST_IMGS = ("assets/scientist1.png", "assets/scientist2.png")
+SCIENTIST_IMGS = (None, "assets/scientist1.png", "assets/scientist2.png")
 BUILDING = False
 start_time = time()
 
@@ -55,7 +55,7 @@ feedback = Feedback()
 #------------------------------------------------------------------
 
 background          = pygame.image.load("assets/Background.png").convert()
-ScientistImg        = pygame.image.load(SCIENTIST_IMGS[0]).convert_alpha()
+ScientistImg        = pygame.image.load(SCIENTIST_IMGS[SCIENTIST_NUM]).convert_alpha()
 ScientificReport    = pygame.image.load("assets/scientific_report.png").convert_alpha()
 peopleTreated       = pygame.image.load("assets/people_treated.png").convert_alpha()
 testsDelivered      = pygame.image.load("assets/tests_delivered.png").convert_alpha()
@@ -147,7 +147,7 @@ def swap_selected(new):
 def update_scientist_num(num:int):
     global SCIENTIST_NUM
     global ScientistImg
-    SCIENTIST_NUM = num+1
+    SCIENTIST_NUM = num
     img = SCIENTIST_IMGS[num]
     ScientistImg = pygame.image.load(img).convert_alpha()
     screen.blit(background, (0,73), (0, 73, 370, 138))
@@ -280,18 +280,18 @@ def give_feedback(question:int, answer:int):
 
 SCANNER_INPUTS = {k : (swap_selected, v) for k, v in refs.items() if not k.endswith('O0')}
 SCANNER_INPUTS.update({
-    "start" : (start_game, None),
-    "build" : (build, None),
-    "close" : (close_game, None),
-    "scientist1" : (update_scientist_num, 1),
-    "scientist2" : (update_scientist_num, 2)
+    "START" : (start_game, None),
+    "BUILD" : (build, None),
+    "CLOSE" : (close_game, None),
+    "SCIENTIST1" : (update_scientist_num, 1),
+    "SCIENTIST2" : (update_scientist_num, 2)
     }) # type: ignore
 
 KB_INPUTS = {
     " " : (start_game, None), # new game / refresh
     "b" : (build, None), # build
-    "1" : (update_scientist_num, 0),
-    "2" : (update_scientist_num, 1),
+    "1" : (update_scientist_num, 1),
+    "2" : (update_scientist_num, 2),
     "q" : (swap_selected, B1O1),
     "w" : (swap_selected, B1O2),
     "e" : (swap_selected, B1O3),
