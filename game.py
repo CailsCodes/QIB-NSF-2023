@@ -357,7 +357,7 @@ while True:
         
         elif e.type == INPUT_TIMEOUT_EVENT:
             if scanner_input in ALL_INPUTS:
-                func, args = ALL_INPUTS[scanner_input]
+                func, args = ALL_INPUTS[scanner_input.upper()]
                 func(args)
             scanner_input = ""
 
